@@ -1,6 +1,6 @@
 # ncat-lib
 
-This repository contains the transformation algorithms/modules used by the NCAT web base tool.
+This repository contains the transformation algorithms/modules used by the NCAT web tool.
 
 For additional information, contact:
 NOAA National Geodetic Survey,
