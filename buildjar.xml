@@ -1,0 +1,85 @@
+<project name="jtransform" default="deploy" basedir=".">
+	<description>
+        jtransform jar build
+    </description>
+	<!-- set global properties for this build -->
+	<property name="src" location="src"/>
+	<property name="docs" location="docs"/>
+	<property name="build" location="build"/>
+	<property name="dist" location="dist"/>
+	<property name="lib.dir" location="lib"/>
+	<property name="thin.jar" location="${dist}/jtransform_thin.jar"/>
+	<!-- link external jars; use local copies for compilation only-->
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="*.jar"/>
+	</path>
+	<target name="init" depends="clean">
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}"/>
+	</target>
+	<target name="compile" depends="init" description="compile the source ">
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac target="1.8" source="1.8" srcdir="${src}" destdir="${build}">
+			<compilerarg line="-Xlint -Xlint:-unchecked -Xlint:-path"/>
+			<classpath refid="classpath"/>
+		</javac>
+	</target>
+
+	<!-- generate a property file for zone constants -->
+	<target name="genConstants" depends="compile,resources">
+		<java classname="gov.noaa.ngs.transform.Util">
+			<arg value="${build}/gov/noaa/ngs/transform/resources/nad83ZoneConstants"/>
+			<arg value="${build}/gov/noaa/ngs/transform/resources/nad27ZoneConstants"/>
+			<classpath>
+				<pathelement location="${build}"/>
+			</classpath>
+		</java>
+	</target>
+	<target name="dist" depends="compile,genConstants,thinClient"/>
+	<!-- generate a jar for thin client -->
+	<target name="thinClient" >
+		<mkdir dir="${dist}"/>
+		<jar destfile="${thin.jar}">
+			<fileset dir="${build}" />
+			<manifest>
+				<attribute name="Main-Class" value="gov.noaa.ngs.transform.test.CLDriver"/>
+				<attribute name="Class-Path" value="log4j-1.2.16.jar"/>
+			</manifest>
+		</jar>
+		<checksum file="${thin.jar}"/>
+		<copy todir="${dist}">
+		<fileset dir="${lib.dir}" includes="log4j-1.2.16.jar"/>
+		</copy>
+	</target>
+	
+	<target name="resources" depends="thinResource"/>
+	<target name="thinResource" >
+		<copy todir="${build}" includeEmptyDirs="no">
+			<fileset dir="src">
+				<patternset>
+					<include name="**/*.properties"/>
+					<include name="**/*.txt"/>
+				</patternset>
+			</fileset>
+		</copy>
+		<replace dir="${build}" value="">
+			<include name="**/*.properties"/>
+			<replacetoken>/home/wrapper/prod/NCAT/</replacetoken>
+		</replace>
+	</target>
+
+	<target name="deploy" depends="dist,javadoc"/>
+	<target name="javadoc" if="javadoc">
+		<mkdir dir="${docs}"/>
+		<javadoc destdir="${docs}" windowtitle="NCAT library">
+			<classpath refid="classpath"/>
+			<fileset dir="src" defaultexcludes="yes"/>
+		</javadoc>
+	</target>
+	<target name="clean" description="clean up">
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+		<delete dir="${docs}"/>
+	</target>
+</project>
