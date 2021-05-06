@@ -315,6 +315,47 @@ java -Dparms=xyz,-217683.881,-5068933.259,3852162.058,NAD83(2011),NAD83(NSRS2007
 
 ## Using NCAT in a java program
 
-The download archive contains the source code being used for NCAT command line version. The filename is CLDriver.java.
-Also included in the archive is a library jar, jtransform_thin.jar, being used for the command line version and a 
-companion javadoc to support custom output formats or conversions.
+The class CLDriver located in the package gov.noaa.ngs.transform.test provides sample conversions and trasformations.
+Additionally, the docs folder in the package has companion javadoc which may be used for custom output formats, conversions and/or transformations.
+
+## Sample use cases and input/output files
+
+You may use sample input and output files for validation to ensure all conversions and transformations are working as expected.
+Here are the steps:
+
+1. Navigate to the dist directory where the library jar is located.
+
+2. To validate conversions, run the following command:
+java -cp jtransform_thin.jar gov.noaa.ngs.transform.test.TestDriver
+
+The command should generate the following output:
+
+Performing conversions against testdata.......
+All Tests Passed. Actual results match expected results
+
+3. To validate nadcon5 transformations, run the following command (please note that the test data contains a few invalid use cases):
+java -cp jtransform_thin.jar gov.noaa.ngs.nadcon5.test.TestDriver
+
+After a few error messages pertaining to invalid use cases, the command should generate the following output:
+All Nadcon Tests Passed. Actual results match expected results
+
+4. To validate vertcon3 transformations run the following command:
+java -cp jtransform_thin.jar gov.noaa.ngs.vertcon.test.TestDriver
+
+The command should generate the following output:
+
+Running tests for PR
+All Tests Passed
+Running tests for AS
+All Tests Passed
+Running tests for VI
+All Tests Passed
+Running tests for ALASKA
+All Tests Passed
+Running tests for CONUS
+All Tests Passed
+Running tests for CNMI
+All Tests Passed
+Running tests for GUAM
+All Tests Passed
+
